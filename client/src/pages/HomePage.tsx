@@ -26,28 +26,31 @@ export default function HomePage() {
   const [expandedPurchaseProcesses, setExpandedPurchaseProcesses] = useState<Record<string, boolean>>({});
 
   // 获取服装种类
-  const { data: garmentTypes = [] } = useQuery({
+  const { data: garmentTypesData } = useQuery<GarmentType[]>({
     queryKey: ['garmentTypes'],
     queryFn: () => garmentApi.getAll(),
   });
+  const garmentTypes: GarmentType[] = garmentTypesData || [];
 
   // 获取属性
-  const { data: attributes = [] } = useQuery({
+  const { data: attributesData } = useQuery<Array<{ attribute: string; remark: string }>>({
     queryKey: ['attributes', selectedGarmentType],
     queryFn: () => garmentApi.getAttributes(selectedGarmentType),
     enabled: !!selectedGarmentType,
   });
+  const attributes: Array<{ attribute: string; remark: string }> = attributesData || [];
 
   // 获取颜色
-  const { data: colors = [] } = useQuery({
+  const { data: colorsData } = useQuery<Color[]>({
     queryKey: ['colors'],
     queryFn: () => colorApi.getAll(),
   });
+  const colors: Color[] = colorsData || [];
 
   // 创建订单
-  const createOrderMutation = useMutation({
+  const createOrderMutation = useMutation<Order, Error, CreateOrderData>({
     mutationFn: (data: CreateOrderData) => orderApi.create(data),
-    onSuccess: (order) => {
+    onSuccess: (order: Order) => {
       setCurrentOrder(order);
       alert('订单创建成功！');
     },
@@ -152,12 +155,12 @@ export default function HomePage() {
       // 更新订单
       await orderApi.update(currentOrder.id, orderData);
       const updatedOrder = await orderApi.getById(currentOrder.id);
-      setCurrentOrder(updatedOrder);
+      setCurrentOrder(updatedOrder as Order);
       // 计算
       await calculateMutation.mutateAsync(currentOrder.id);
       // 重新获取订单数据
       const finalOrder = await orderApi.getById(currentOrder.id);
-      setCurrentOrder(finalOrder);
+      setCurrentOrder(finalOrder as Order);
     } else {
       // 创建新订单
       const order = await createOrderMutation.mutateAsync(orderData);
@@ -308,7 +311,7 @@ export default function HomePage() {
             }}
           >
             <option value="">请选择</option>
-            {Array.from(new Set(garmentTypes.map((g) => g.typeName))).map((typeName) => (
+            {Array.from(new Set(garmentTypes.map((g: GarmentType) => g.typeName))).map((typeName: string) => (
               <option key={typeName} value={typeName}>
                 {typeName}
               </option>
@@ -395,7 +398,7 @@ export default function HomePage() {
       {/* 订单详情 */}
       <div className="card">
         <h2 className="card-title">订单详情</h2>
-        {orderDetails.map((detail, index) => (
+        {orderDetails.map((detail: { colorId: number; quantity: string }, index: number) => (
           <div key={index} style={{ display: 'flex', gap: '12px', marginBottom: '12px' }}>
             <select
               className="form-select"

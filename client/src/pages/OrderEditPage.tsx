@@ -14,11 +14,13 @@ export default function OrderEditPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const { data: order, isLoading } = useQuery({
+  const { data: orderData, isLoading } = useQuery<Order>({
     queryKey: ['order', id],
     queryFn: () => orderApi.getById(parseInt(id!)),
     enabled: !!id,
   });
+
+  const order: Order | undefined = orderData;
 
   const [selectedGarmentType, setSelectedGarmentType] = useState<string>('');
   const [selectedAttribute, setSelectedAttribute] = useState<string>('');
@@ -32,23 +34,26 @@ export default function OrderEditPage() {
   const [measurements, setMeasurements] = useState<Record<string, string>>({});
 
   // 获取服装种类
-  const { data: garmentTypes = [] } = useQuery({
+  const { data: garmentTypesData } = useQuery<GarmentType[]>({
     queryKey: ['garmentTypes'],
     queryFn: () => garmentApi.getAll(),
   });
+  const garmentTypes: GarmentType[] = garmentTypesData || [];
 
   // 获取属性
-  const { data: attributes = [] } = useQuery({
+  const { data: attributesData } = useQuery<Array<{ attribute: string; remark: string }>>({
     queryKey: ['attributes', selectedGarmentType],
     queryFn: () => garmentApi.getAttributes(selectedGarmentType),
     enabled: !!selectedGarmentType,
   });
+  const attributes: Array<{ attribute: string; remark: string }> = attributesData || [];
 
   // 获取颜色
-  const { data: colors = [] } = useQuery({
+  const { data: colorsData } = useQuery<Color[]>({
     queryKey: ['colors'],
     queryFn: () => colorApi.getAll(),
   });
+  const colors: Color[] = colorsData || [];
 
   // 加载订单数据到表单
   useEffect(() => {
@@ -234,7 +239,7 @@ export default function OrderEditPage() {
                 onChange={(e) => setSelectedAttribute(e.target.value)}
               >
                 <option value="">请选择</option>
-                {attributes.map((attr, index) => (
+                {attributes.map((attr: { attribute: string; remark: string }, index: number) => (
                   <option key={index} value={attr.attribute}>
                     {attr.attribute}
                   </option>
@@ -317,7 +322,7 @@ export default function OrderEditPage() {
                 onChange={(e) => handleOrderDetailChange(index, 'colorId', parseInt(e.target.value))}
               >
                 <option value="0">请选择颜色</option>
-                {colors.map((color) => (
+                {colors.map((color: Color) => (
                   <option key={color.id} value={color.id}>
                     {color.name}
                   </option>

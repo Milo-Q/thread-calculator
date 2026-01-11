@@ -13,10 +13,12 @@ export default function GarmentManagePage() {
     remark: '',
   });
 
-  const { data: garments = [], isLoading } = useQuery({
+  const { data: garmentsData, isLoading } = useQuery<GarmentType[]>({
     queryKey: ['garmentTypes'],
     queryFn: () => garmentApi.getAll(),
   });
+
+  const garments: GarmentType[] = garmentsData || [];
 
   const createMutation = useMutation({
     mutationFn: (data: { typeName: string; attribute: string; remark: string }) =>

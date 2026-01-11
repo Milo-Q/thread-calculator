@@ -13,10 +13,12 @@ export default function ColorManager({ onColorSelect, selectedColorId }: ColorMa
   const [editingId, setEditingId] = useState<number | null>(null);
   const [colorName, setColorName] = useState('');
 
-  const { data: colors = [] } = useQuery({
+  const { data: colorsData } = useQuery<Color[]>({
     queryKey: ['colors'],
     queryFn: () => colorApi.getAll(),
   });
+
+  const colors: Color[] = colorsData || [];
 
   const createMutation = useMutation({
     mutationFn: (name: string) => colorApi.create(name),

@@ -7,7 +7,7 @@ export default function HistoryPage() {
   const [searchKeyword, setSearchKeyword] = useState('');
   const [selectedGarmentType, setSelectedGarmentType] = useState('');
 
-  const { data: orders = [], isLoading } = useQuery({
+  const { data: ordersData, isLoading } = useQuery<Order[]>({
     queryKey: ['orders', searchKeyword, selectedGarmentType],
     queryFn: () =>
       orderApi.getAll({
@@ -15,6 +15,8 @@ export default function HistoryPage() {
         garmentType: selectedGarmentType || undefined,
       }),
   });
+
+  const orders: Order[] = ordersData || [];
 
   const deleteMutation = useMutation({
     mutationFn: (id: number) => orderApi.delete(id),
@@ -59,7 +61,7 @@ export default function HistoryPage() {
             onChange={(e) => setSelectedGarmentType(e.target.value)}
           >
             <option value="">全部服装种类</option>
-            {garmentTypes.map((type) => (
+            {garmentTypes.map((type: string) => (
               <option key={type} value={type}>
                 {type}
               </option>
@@ -89,7 +91,7 @@ export default function HistoryPage() {
               </tr>
             </thead>
             <tbody>
-              {orders.map((order) => (
+              {orders.map((order: Order) => (
                 <tr key={order.id}>
                   <td>{order.id}</td>
                   <td>{order.garmentType}</td>

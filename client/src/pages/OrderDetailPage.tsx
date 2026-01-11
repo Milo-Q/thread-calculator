@@ -12,11 +12,13 @@ export default function OrderDetailPage() {
   const [expandedProcesses, setExpandedProcesses] = useState<Record<string, boolean>>({});
   const [expandedPurchaseProcesses, setExpandedPurchaseProcesses] = useState<Record<string, boolean>>({});
 
-  const { data: order, isLoading } = useQuery({
+  const { data: orderData, isLoading } = useQuery<Order>({
     queryKey: ['order', id],
     queryFn: () => orderApi.getById(parseInt(id!)),
     enabled: !!id,
   });
+
+  const order: Order | undefined = orderData;
 
   const deleteMutation = useMutation({
     mutationFn: () => orderApi.delete(parseInt(id!)),
@@ -66,8 +68,8 @@ export default function OrderDetailPage() {
       if (order.materials.length === 1 && order.materials[0].threadType === '平车线') {
         return '平车线';
       }
-      const hasPlainThread = order.materials.some((m) => m.threadType === '平车线');
-      const hasSilkThread = order.materials.some((m) => m.threadType === '丝光线');
+      const hasPlainThread = order.materials.some((m: any) => m.threadType === '平车线');
+      const hasSilkThread = order.materials.some((m: any) => m.threadType === '丝光线');
       if (hasPlainThread && hasSilkThread) {
         if (process === '平车') return '平车线';
         return '丝光线';
@@ -77,7 +79,7 @@ export default function OrderDetailPage() {
 
     const grouped: Record<string, Array<{ colorName: string; quantity: number; amount: number }>> = {};
     
-    order.calculations.forEach((calc) => {
+      order.calculations.forEach((calc: any) => {
       const threadType = getThreadTypeByProcess(calc.process);
       if (!threadType) return;
       
@@ -112,7 +114,7 @@ export default function OrderDetailPage() {
   const getCalculationDataByProcess = () => {
     if (!order.calculations) return {};
     const grouped: Record<string, Calculation[]> = {};
-    order.calculations.forEach((calc) => {
+      order.calculations.forEach((calc: any) => {
       if (!grouped[calc.process]) {
         grouped[calc.process] = [];
       }
@@ -125,7 +127,7 @@ export default function OrderDetailPage() {
   const getPurchaseData = () => {
     if (!order.calculations) return {};
     const grouped: Record<string, Calculation[]> = {};
-    order.calculations.forEach((calc) => {
+      order.calculations.forEach((calc: any) => {
       if (!grouped[calc.process]) {
         grouped[calc.process] = [];
       }
@@ -391,7 +393,7 @@ export default function OrderDetailPage() {
           <div>
             <strong>原料信息：</strong>
             <ul style={{ marginTop: '8px', paddingLeft: '20px' }}>
-              {order.materials.map((m) => (
+                    {order.materials.map((m: any) => (
                 <li key={m.id}>
                   {m.threadType} - 一轴线长：{m.spoolLength}米 - 线单价：{m.unitPrice}元/轴
                 </li>
@@ -401,7 +403,7 @@ export default function OrderDetailPage() {
           <div>
             <strong>订单详情：</strong>
             <ul style={{ marginTop: '8px', paddingLeft: '20px' }}>
-              {order.orderDetails.map((od) => (
+                    {order.orderDetails.map((od: any) => (
                 <li key={od.id}>
                   {od.color?.name || '未知颜色'} - {od.quantity}件
                 </li>
