@@ -1,6 +1,21 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+// 获取API基础URL，确保以/api结尾
+const getApiBaseUrl = () => {
+  const envUrl = import.meta.env.VITE_API_BASE_URL;
+  if (!envUrl) return '/api';
+  
+  // 如果环境变量已经包含/api，直接使用
+  if (envUrl.endsWith('/api')) return envUrl;
+  
+  // 如果环境变量以/结尾，添加api
+  if (envUrl.endsWith('/')) return `${envUrl}api`;
+  
+  // 否则添加/api
+  return `${envUrl}/api`;
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
