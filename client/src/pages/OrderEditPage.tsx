@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { orderApi, Order, CreateOrderData } from '../api/orders';
-import { garmentApi } from '../api/garments';
-import { colorApi } from '../api/colors';
+import { garmentApi, GarmentType } from '../api/garments';
+import { colorApi, Color } from '../api/colors';
 import ColorManager from '../components/ColorManager';
 
 const PROCESSES = ['平车', '三线', '四线', '五线', '坎车', '三针五线'];
