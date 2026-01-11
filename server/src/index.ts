@@ -13,8 +13,27 @@ import statisticsRoutes from './routes/statistics';
 const app = express();
 
 // Middleware
+const allowedOrigins = process.env.CORS_ORIGIN 
+  ? process.env.CORS_ORIGIN.split(',')
+  : ['http://localhost:5173'];
+
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+  origin: (origin, callback) => {
+    // 允许没有origin的请求（如移动应用、Postman等）
+    if (!origin) return callback(null, true);
+    
+    // 检查是否在允许列表中
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      // 允许所有Vercel域名
+      if (origin.includes('.vercel.app')) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    }
+  },
   credentials: true
 }));
 app.use(express.json());
