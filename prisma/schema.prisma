@@ -1,0 +1,119 @@
+// Prisma Schema for Thread Calculator
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:../server/dev.db"
+}
+
+// 服装种类数据库
+model GarmentType {
+  id        Int      @id @default(autoincrement())
+  typeName  String   // 服装种类名称（如：冲锋衣、短裤等）
+  attribute String   // 属性（如：挂里、不挂里、简单、复杂等）
+  remark    String   // 备注
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([typeName, attribute])
+  @@index([typeName])
+}
+
+// 颜色数据库
+model Color {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique // 颜色名称
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orderDetails OrderDetail[]
+}
+
+// 订单数据库
+model Order {
+  id           Int      @id @default(autoincrement())
+  garmentType  String   // 服装种类
+  attribute    String   // 属性
+  remark       String   // 备注（自动生成）
+  singleCost   Float?   // 单件线费（计算得出）
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  materials      Material[]
+  orderDetails   OrderDetail[]
+  measurements   Measurement[]
+  calculations   Calculation[]
+}
+
+// 原料信息数据库
+model Material {
+  id           Int      @id @default(autoincrement())
+  orderId      Int      // 订单ID
+  threadType   String   // 线种类（平车线、丝光线等）
+  spoolLength  Float    // 一轴线长（单位：米）
+  unitPrice    Float    // 线单价（单位：元/轴）
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+}
+
+// 订单详情数据库
+model OrderDetail {
+  id        Int      @id @default(autoincrement())
+  orderId   Int      // 订单ID
+  colorId   Int      // 颜色ID
+  quantity  Int      // 数量（单位：件）
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  color Color @relation(fields: [colorId], references: [id], onDelete: Restrict)
+
+  @@index([orderId])
+  @@index([colorId])
+}
+
+// 测量数据数据库
+model Measurement {
+  id           Int      @id @default(autoincrement())
+  orderId      Int      // 订单ID
+  process      String   // 工艺（平车、三线、四线、五线、坎车、三针五线）
+  measureValue Float?   // 测量数据（单位：米，可为空）
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@unique([orderId, process])
+  @@index([orderId])
+}
+
+// 核算数据数据库
+model Calculation {
+  id             Int      @id @default(autoincrement())
+  orderId        Int      // 订单ID
+  process        String   // 工艺
+  colorId        Int      // 颜色ID
+  quantity       Int      // 数量（来自订单详情）
+  measureValue   Float?   // 测量数据
+  unitUsage      Float?   // 单件用量（计算得出，单位：米）
+  spoolLength    Float    // 一轴线长度（单位：米）
+  requiredQty    Float    // 需要线数量（计算得出，单位：轴）
+  unitPrice      Float    // 线单价（单位：元/轴）
+  purchaseAmount Float    // 采购金额（计算得出，单位：元）
+  threadCost     Float    // 线费（计算得出，单位：元）
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([orderId, process])
+  @@index([orderId, process, colorId])
+}
+

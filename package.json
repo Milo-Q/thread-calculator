@@ -1,0 +1,20 @@
+{
+  "name": "thread-calculator",
+  "version": "1.0.0",
+  "description": "缝纫线计算器 - 根据订单计算所需缝纫线的数量和金额",
+  "scripts": {
+    "dev:client": "cd client && npm run dev",
+    "dev:server": "cd server && npm run dev",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "build:client": "cd client && npm run build",
+    "build:server": "cd server && npm run build",
+    "install:all": "npm install && cd client && npm install && cd ../server && npm install"
+  },
+  "keywords": ["thread", "calculator", "sewing", "production"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
+

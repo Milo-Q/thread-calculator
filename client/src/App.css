@@ -1,0 +1,44 @@
+.App {
+  min-height: 100vh;
+}
+
+.navbar {
+  background-color: #343a40;
+  color: white;
+  padding: 16px 0;
+  margin-bottom: 24px;
+}
+
+.navbar .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar-brand {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.navbar-nav {
+  display: flex;
+  gap: 24px;
+}
+
+.nav-link {
+  color: white;
+  text-decoration: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.main-content {
+  min-height: calc(100vh - 100px);
+}
+
