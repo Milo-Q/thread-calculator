@@ -48,9 +48,9 @@ export default function HomePage() {
   const colors: Color[] = colorsData || [];
 
   // 创建订单
-  const createOrderMutation = useMutation<Order, Error, CreateOrderData>({
+  const createOrderMutation = useMutation({
     mutationFn: (data: CreateOrderData) => orderApi.create(data),
-    onSuccess: (order: Order) => {
+    onSuccess: (order) => {
       setCurrentOrder(order);
       alert('订单创建成功！');
     },
@@ -155,12 +155,12 @@ export default function HomePage() {
       // 更新订单
       await orderApi.update(currentOrder.id, orderData);
       const updatedOrder = await orderApi.getById(currentOrder.id);
-      setCurrentOrder(updatedOrder as Order);
+      setCurrentOrder(updatedOrder);
       // 计算
       await calculateMutation.mutateAsync(currentOrder.id);
       // 重新获取订单数据
       const finalOrder = await orderApi.getById(currentOrder.id);
-      setCurrentOrder(finalOrder as Order);
+      setCurrentOrder(finalOrder);
     } else {
       // 创建新订单
       const order = await createOrderMutation.mutateAsync(orderData);
