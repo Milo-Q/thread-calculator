@@ -10,7 +10,7 @@ export default function OrderManagePage() {
   const [selectedGarmentType, setSelectedGarmentType] = useState('');
   const [expandedGarmentTypes, setExpandedGarmentTypes] = useState<Record<string, boolean>>({});
 
-  const { data: orders = [], isLoading } = useQuery({
+  const { data: ordersData, isLoading } = useQuery<Order[]>({
     queryKey: ['orders', searchKeyword, selectedGarmentType],
     queryFn: () =>
       orderApi.getAll({
@@ -18,6 +18,8 @@ export default function OrderManagePage() {
         garmentType: selectedGarmentType || undefined,
       }),
   });
+
+  const orders: Order[] = ordersData || [];
 
   const deleteMutation = useMutation({
     mutationFn: (id: number) => orderApi.delete(id),
@@ -100,7 +102,7 @@ export default function OrderManagePage() {
   const garmentTypes = Array.from(new Set(orders.map((o) => o.garmentType)));
 
   // 按服装种类分组订单
-  const ordersByGarmentType = orders.reduce((acc, order) => {
+  const ordersByGarmentType = orders.reduce((acc: Record<string, Order[]>, order: Order) => {
     if (!acc[order.garmentType]) {
       acc[order.garmentType] = [];
     }
@@ -159,7 +161,7 @@ export default function OrderManagePage() {
           <p>暂无订单</p>
         ) : (
           <div style={{ display: 'grid', gap: '16px' }}>
-            {Object.entries(ordersByGarmentType).map(([garmentType, typeOrders]) => {
+            {Object.entries(ordersByGarmentType).map(([garmentType, typeOrders]: [string, Order[]]) => {
               const isExpanded = expandedGarmentTypes[garmentType] ?? false;
               return (
                 <div key={garmentType} style={{ border: '1px solid #e0e0e0', borderRadius: '8px', overflow: 'hidden' }}>
@@ -184,7 +186,7 @@ export default function OrderManagePage() {
                   </div>
                   {isExpanded && (
                     <div style={{ padding: '16px', display: 'grid', gap: '16px' }}>
-                      {typeOrders.map((order) => {
+                      {typeOrders.map((order: Order) => {
                         const summaryResult = getPurchaseSummaryByThreadType(order);
                         const summary = summaryResult as any;
                         const hasData = summary.hasData !== false;

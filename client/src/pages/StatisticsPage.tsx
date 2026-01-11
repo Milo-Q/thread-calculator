@@ -1,22 +1,24 @@
 import { useQuery } from '@tanstack/react-query';
-import { statisticsApi } from '../api/statistics';
+import { statisticsApi, StatisticsItem } from '../api/statistics';
 
 const PROCESSES = ['平车', '三线', '四线', '五线', '坎车', '三针五线'];
 
 export default function StatisticsPage() {
-  const { data: statistics = [], isLoading } = useQuery({
+  const { data: statisticsData, isLoading } = useQuery<StatisticsItem[]>({
     queryKey: ['statistics'],
     queryFn: () => statisticsApi.getAll(),
   });
 
+  const statistics: StatisticsItem[] = statisticsData || [];
+
   // 按服装种类分组
-  const groupedByGarmentType = statistics.reduce((acc, item) => {
+  const groupedByGarmentType = statistics.reduce((acc: Record<string, StatisticsItem[]>, item: StatisticsItem) => {
     if (!acc[item.garmentType]) {
       acc[item.garmentType] = [];
     }
     acc[item.garmentType].push(item);
     return acc;
-  }, {} as Record<string, typeof statistics>);
+  }, {} as Record<string, StatisticsItem[]>);
 
   if (isLoading) {
     return <div className="container">加载中...</div>;
@@ -31,7 +33,7 @@ export default function StatisticsPage() {
           <p>暂无统计数据</p>
         </div>
       ) : (
-        Object.entries(groupedByGarmentType).map(([garmentType, items]) => (
+        Object.entries(groupedByGarmentType).map(([garmentType, items]: [string, StatisticsItem[]]) => (
           <div key={garmentType} className="card" style={{ marginBottom: '24px' }}>
             <h2 className="card-title" style={{ color: '#007bff', marginBottom: '16px' }}>
               {garmentType}
@@ -49,7 +51,7 @@ export default function StatisticsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {items.map((item, index) => (
+                  {items.map((item: StatisticsItem, index: number) => (
                     <tr key={index}>
                       <td>{item.attribute}</td>
                       <td>{item.orderCount}</td>
