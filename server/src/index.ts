@@ -24,15 +24,21 @@ app.use(cors({
     
     // 检查是否在允许列表中
     if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      // 允许所有Vercel域名
-      if (origin.includes('.vercel.app')) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
+      return callback(null, true);
     }
+    
+    // 允许所有Vercel域名
+    if (origin.includes('.vercel.app')) {
+      return callback(null, true);
+    }
+    
+    // 允许自定义域名 xjyszy.cn
+    if (origin.includes('xjyszy.cn')) {
+      return callback(null, true);
+    }
+    
+    // 其他情况拒绝
+    callback(new Error('Not allowed by CORS'));
   },
   credentials: true
 }));
